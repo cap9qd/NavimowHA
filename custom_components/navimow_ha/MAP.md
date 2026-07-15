@@ -1,51 +1,51 @@
-# Navimow Live-Karte
+# Navimow Live Map
 
-## Koordinatensystem
+## Coordinate System
 
-Die Position (X/Y) vom Navimow ist **lokal** in Metern ab der Ladestation — **kein GPS**.
+The position (X/Y) from Navimow is **local** in meters from the charging station — **no GPS**.
 
-| Wert | Bedeutung |
+| Value | Meaning |
 |------|-----------|
-| X | Ost (+) / West (-) in Metern |
-| Y | Nord (+) / Süd (-) in Metern |
-| θ (Theta) | Ausrichtung in Radiant |
+| X | East (+) / West (-) in meters |
+| Y | North (+) / South (-) in meters |
+| θ (Theta) | Orientation in radians |
 
-Ursprung (0, 0) = Ladestation.
+Origin (0, 0) = Charging station.
 
-## SVG Live-Karte (in dashboard-cards.yaml)
+## SVG Live Map (in dashboard-cards.yaml)
 
-Die enthaltene SVG-Karte zeigt:
-- Ladestation als goldenen ⚡-Punkt in der Mitte
-- Mäher als farbigen Kreis mit Richtungspfeil
-- Pulsierende Animation während des Mähens
-- Rotierende Klinge während des Mähens
-- Batterie-Balken und Positionsanzeige direkt auf der Karte
+The included SVG map shows:
+- Charging station as golden ⚡-point in the center
+- Mower as colored circle with direction arrow
+- Pulsing animation while mowing
+- Rotating blade while mowing
+- Battery bar and position display directly on the map
 
-### RANGE anpassen
+### Adjust RANGE
 
-In \dashboard-cards.yaml\ (ca. Zeile 80):
+In \dashboard-cards.yaml\ (approx. line 80):
 
-\\\javascript
-const RANGE = 12;  // Radius in Metern
-\\\
+\```javascript
+const RANGE = 12;  // Radius in meters
+\```
 
-Wähle den Wert passend zu deinem Rasen:
-- Kleiner Rasen (< 100 m²): \RANGE = 6\
-- Mittlerer Rasen (~300 m²): \RANGE = 12\
-- Großer Rasen (> 500 m²): \RANGE = 20\
+Choose the value according to your lawn:
+- Small lawn (< 100 m²): \RANGE = 6\
+- Medium lawn (~300 m²): \RANGE = 12\
+- Large lawn (> 500 m²): \RANGE = 20\
 
-## Echte GPS-Karte
+## Real GPS Map
 
-Falls der Mäher echte GPS-Koordinaten liefert (zukünftige SDK-Version),
-wird der Standard-HA-Kartentyp automatisch funktionieren:
+If the mower provides real GPS coordinates (future SDK version),
+the standard HA map type will work automatically:
 
-\\\yaml
+\```yaml
 type: map
 entities:
   - device_tracker.navimow_[DEVICE_ID]_location
 default_zoom: 19
-\\\
+\```
 
-Aktuell meldet \device_tracker\ die lokalen X/Y-Werte als Lat/Lon — 
-dies platziert den Mäher zwar an einem willkürlichen Weltkartenort,
-ist aber für die native HA-Karte funktional (Bewegung ist sichtbar).
+Currently \device_tracker\ reports the local X/Y values as Lat/Lon — 
+this places the mower at an arbitrary world map location,
+but is functional for the native HA map (movement is visible).

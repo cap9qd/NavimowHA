@@ -1,25 +1,25 @@
 ##############################################################################
 # NAVIMOW – Home Assistant Dashboard (Lovelace View)
 #
-# BENÖTIGTE HACS FRONTEND-CARDS (HACS → Frontend → suchen & installieren):
+# REQUIRED HACS FRONTEND CARDS (HACS → Frontend → search & install):
 #   • Mushroom Cards       → lovelace-mushroom
 #   • Button Card          → lovelace-button-card
 #   • Mini Graph Card      → mini-graph-card
-#   • Card Mod             → lovelace-card-mod      (nur für Fehlerkarte)
+#   • Card Mod             → lovelace-card-mod      (only for error card)
 #
-# ANLEITUNG:
-#   1. HACS-Cards oben installieren & HA neu laden
-#   2. Suche deine Geräte-ID:
-#        HA → Entwicklerwerkzeuge → Zustände → "navimow" suchen
-#        Beispiel: sensor.navimow_m550_battery → ID = m550
-#   3. Ersetze ALLE Vorkommen von [DEVICE_ID] mit deiner ID
-#   4. Dashboard → ⋮ → Dashboard bearbeiten → Ansicht hinzufügen
-#        → RAW-Konfigurationseditor → diesen YAML einfügen
-#   5. RANGE (Zeile ~80) auf deinen Rasenradius in Metern anpassen
+# INSTRUCTIONS:
+#   1. Install HACS cards above & reload HA
+#   2. Find your device ID:
+#        HA → Developer Tools → States → search for "navimow"
+#        Example: sensor.navimow_m550_battery → ID = m550
+#   3. Replace ALL occurrences of [DEVICE_ID] with your ID
+#   4. Dashboard → ⋮ → Edit Dashboard → Add View
+#        → RAW Configuration Editor → paste this YAML
+#   5. Adjust RANGE (line ~80) to your lawn radius in meters
 #
-# Koordinaten-Hinweis:
-#   Die Position (X/Y) ist LOKAL in Metern ab Ladestation – kein GPS!
-#   Die Live-Karte zeigt die relative Position innerhalb des Mähbereichs.
+# Coordinate Note:
+#   The position (X/Y) is LOCAL in meters from charging station – no GPS!
+#   The live map shows the relative position within the mowing area.
 ##############################################################################
 
 title: Navimow
@@ -29,17 +29,17 @@ badges: []
 cards:
 
   # ═══════════════════════════════════════════════════════════════════
-  # 1. TITEL & STATUS-CHIPS
+  # 1. TITLE & STATUS CHIPS
   # ═══════════════════════════════════════════════════════════════════
   - type: custom:mushroom-title-card
-    title: "🌿 Navimow Rasenmäher"
+    title: "🌿 Navimow Lawn Mower"
     subtitle: >-
       {% set s = states('sensor.navimow_[DEVICE_ID]_status') %}
-      {% if s == 'mowing' %}⚙️ Mäht gerade...
-      {% elif s == 'charging' %}🔋 Wird geladen
-      {% elif s == 'docked' %}🏠 Geparkt an Ladestation
-      {% elif s == 'paused' %}⏸️ Pausiert
-      {% elif s == 'error' %}🔴 Fehler aufgetreten!
+      {% if s == 'mowing' %}⚙️ Currently mowing...
+      {% elif s == 'charging' %}🔋 Charging
+      {% elif s == 'docked' %}🏠 Docked at charging station
+      {% elif s == 'paused' %}⏸️ Paused
+      {% elif s == 'error' %}🔴 Error occurred!
       {% else %}● {{ s | capitalize }}{% endif %}
 
   - type: custom:mushroom-chips-card
@@ -65,17 +65,17 @@ cards:
             state: "on"
         chip:
           type: template
-          content: "Fehler!"
+          content: "Error!"
           icon: mdi:alert
           icon_color: red
 
   # ═══════════════════════════════════════════════════════════════════
-  # 2. LIVE-KARTE (SVG) + BATTERIE
+  # 2. LIVE MAP (SVG) + BATTERY
   # ═══════════════════════════════════════════════════════════════════
   - type: horizontal-stack
     cards:
 
-      # ─── SVG Live-Karte ──────────────────────────────────────────
+      # ─── SVG Live Map ──────────────────────────────────────────
       - type: custom:button-card
         show_icon: false
         show_name: false
@@ -95,7 +95,7 @@ cards:
         custom_fields:
           map: >
             [[[
-              // ─── EINSTELLUNG: Rasenradius in Metern ──────────────
+              // ─── SETTING: Lawn radius in meters ──────────────
               const RANGE = 12;
               // ─────────────────────────────────────────────────────
 
@@ -110,8 +110,8 @@ cards:
 
               if (!xS || xS.state === 'unavailable' || xS.state === 'unknown') {
                 return `<svg viewBox="0 0 ${W} 70" style="width:100%;background:#0d1f0d;">
-                  <text x="${W/2}" y="38" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="13" font-family="sans-serif">Keine Positionsdaten verfügbar</text>
-                  <text x="${W/2}" y="56" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-size="10" font-family="sans-serif">Mäher nicht verbunden oder offline</text>
+                  <text x="${W/2}" y="38" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="13" font-family="sans-serif">No position data available</text>
+                  <text x="${W/2}" y="56" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-size="10" font-family="sans-serif">Mower not connected or offline</text>
                 </svg>`;
               }
 
@@ -126,21 +126,21 @@ cards:
               const isError    = status === 'error';
               const isPaused   = status === 'paused';
 
-              // Mäher-Farbe je Status
+              // Mower color by status
               const mColor = isError   ? '#f44336'
                            : isMowing  ? '#4CAF50'
                            : isPaused  ? '#FF9800'
                            : isCharging? '#FFC107'
                            : '#78909C';
 
-              // SVG-Koordinaten (0,0 = Ladestaton = Mitte der Karte)
+              // SVG coordinates (0,0 = charging station = center of map)
               const mapW = W - 2 * MARGIN;
               const mapH = H - 2 * MARGIN;
               const mX = MARGIN + mapW / 2 + (x / RANGE) * (mapW / 2);
-              const mY = MARGIN + mapH / 2 - (y / RANGE) * (mapH / 2);  // Y invertiert
-              const aDeg = (theta * 180 / Math.PI) - 90;  // SVG-Winkel (Norden oben)
+              const mY = MARGIN + mapH / 2 - (y / RANGE) * (mapH / 2);  // Y inverted
+              const aDeg = (theta * 180 / Math.PI) - 90;  // SVG angle (north up)
 
-              // Gitter
+              // Grid
               let grid = '';
               for (let i = 0; i <= 4; i++) {
                 const gx = MARGIN + (i / 4) * mapW;
@@ -150,15 +150,15 @@ cards:
                 grid += `<line x1="${MARGIN}" y1="${gy}" x2="${W-MARGIN}" y2="${gy}" stroke="rgba(144,210,144,${a})" stroke-width="1"/>`;
               }
 
-              // Batterie-Balken
+              // Battery bar
               const batW = 72, batH = 12;
               const batFill = Math.max(0, Math.min(100, battery));
               const batColor = batFill > 50 ? '#4CAF50' : batFill > 20 ? '#FFC107' : '#f44336';
 
-              // Entfernung zur Ladestation
+              // Distance to charging station
               const dist = Math.sqrt(x*x + y*y).toFixed(1);
 
-              // Animations-Gruppen (nur SVG-native, kein CSS)
+              // Animation groups (SVG-native only, no CSS)
               const pulseRing = isMowing ? `
                 <circle r="12" fill="${mColor}" opacity="0.0">
                   <animate attributeName="r"       values="12;24;12" dur="2.2s" repeatCount="indefinite"/>
@@ -175,10 +175,10 @@ cards:
                 : `<line x1="-5" y1="0" x2="5" y2="0" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
                    <line x1="0" y1="-5" x2="0" y2="5" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>`;
 
-              const statusLabel = isMowing   ? '⚙ MÄHT'
-                                : isCharging ? '⚡ LÄDT'
-                                : isPaused   ? '⏸ PAUSE'
-                                : isError    ? '⚠ FEHLER'
+              const statusLabel = isMowing   ? '⚙ MOWING'
+                                : isCharging ? '⚡ CHARGING'
+                                : isPaused   ? '⏸ PAUSED'
+                                : isError    ? '⚠ ERROR'
                                 : status.toUpperCase();
 
               return `
@@ -199,18 +199,18 @@ cards:
                   </filter>
                 </defs>
 
-                <!-- Rasenhintergrund -->
+                <!-- Lawn background -->
                 <rect width="${W}" height="${H}" fill="url(#ng)"/>
 
-                <!-- Kartenbereich -->
+                <!-- Map area -->
                 <rect x="${MARGIN}" y="${MARGIN}" width="${mapW}" height="${mapH}"
                       fill="rgba(0,60,0,0.18)" stroke="rgba(144,210,144,0.18)"
                       stroke-width="1" rx="6"/>
 
-                <!-- Gitter -->
+                <!-- Grid -->
                 ${grid}
 
-                <!-- Maßstab (unten links) -->
+                <!-- Scale bar (bottom left) -->
                 <line x1="${MARGIN+4}" y1="${H-MARGIN+6}" x2="${MARGIN+4+mapW/4}" y2="${H-MARGIN+6}"
                       stroke="#4CAF50" stroke-width="1.5" stroke-linecap="round"/>
                 <line x1="${MARGIN+4}" y1="${H-MARGIN+3}" x2="${MARGIN+4}" y2="${H-MARGIN+9}"
@@ -221,29 +221,29 @@ cards:
                       text-anchor="middle" font-size="8" fill="#4CAF50" opacity="0.7"
                       font-family="monospace">${(RANGE/2).toFixed(0)}m</text>
 
-                <!-- Ladestation (Mitte) -->
+                <!-- Charging station (center) -->
                 <g transform="translate(${MARGIN+mapW/2}, ${MARGIN+mapH/2})" filter="url(#gl)">
                   <circle r="11" fill="#FFC107" opacity="0.88"/>
                   <text text-anchor="middle" dominant-baseline="middle" font-size="11">⚡</text>
                 </g>
 
-                <!-- Mäher-Schatten -->
+                <!-- Mower shadow -->
                 <ellipse cx="${mX+2}" cy="${mY+3}" rx="13" ry="7" fill="rgba(0,0,0,0.35)"/>
 
-                <!-- Mäher -->
+                <!-- Mower -->
                 <g transform="translate(${mX},${mY})" filter="url(#sg)">
                   ${pulseRing}
                   <circle r="12" fill="${mColor}" opacity="0.92"/>
-                  <!-- Richtungspfeil -->
+                  <!-- Direction arrow -->
                   <g transform="rotate(${aDeg})">
                     <polygon points="0,-17 -5,-8 5,-8" fill="white" opacity="0.85"/>
                   </g>
-                  <!-- Messerblatt -->
+                  <!-- Blade -->
                   ${bladeGroup}
                   <circle r="2.5" fill="white" opacity="0.9"/>
                 </g>
 
-                <!-- Info-Box oben links: Koordinaten -->
+                <!-- Info box top left: Coordinates -->
                 <rect x="4" y="4" width="98" height="44" rx="7" fill="rgba(0,0,0,0.6)"/>
                 <text x="10" y="17" font-size="9" fill="rgba(255,255,255,0.75)" font-family="monospace">
                   X ${x >= 0 ? '+' : ''}${x.toFixed(2)} m</text>
@@ -252,7 +252,7 @@ cards:
                 <text x="10" y="41" font-size="8"  fill="rgba(255,255,255,0.45)" font-family="monospace">
                   ∅ ${dist} m · θ ${(theta * 180/Math.PI).toFixed(0)}°</text>
 
-                <!-- Batterie-Anzeige oben rechts -->
+                <!-- Battery display top right -->
                 <rect x="${W-104}" y="5" width="100" height="20" rx="6" fill="rgba(0,0,0,0.6)"/>
                 <rect x="${W-100}" y="9"  width="${batW}" height="${batH}" rx="3" fill="rgba(255,255,255,0.1)"/>
                 <rect x="${W-100}" y="9"  width="${batW * batFill / 100}" height="${batH}" rx="3" fill="${batColor}" opacity="0.85"/>
@@ -260,7 +260,7 @@ cards:
                 <text x="${W-64}" y="19" text-anchor="middle" font-size="9"
                       fill="white" font-weight="700" font-family="sans-serif">${battery}%</text>
 
-                <!-- Status-Badge unten -->
+                <!-- Status badge bottom -->
                 <rect x="${W/2-44}" y="${H-21}" width="88" height="18" rx="9"
                       fill="${mColor}" opacity="0.88"/>
                 <text x="${W/2}" y="${H-9}" text-anchor="middle" font-size="10"
@@ -269,12 +269,12 @@ cards:
               </svg>`;
             ]]]
 
-      # ─── Batterie-Gauge + Graph ───────────────────────────────────
+      # ─── Battery Gauge + Graph ───────────────────────────────────
       - type: vertical-stack
         cards:
           - type: gauge
             entity: sensor.navimow_[DEVICE_ID]_battery
-            name: Batterie
+            name: Battery
             min: 0
             max: 100
             needle: true
@@ -285,7 +285,7 @@ cards:
 
           - type: custom:mini-graph-card
             entity: sensor.navimow_[DEVICE_ID]_battery
-            name: Batterieverlauf (24h)
+            name: Battery History (24h)
             hours_to_show: 24
             points_per_hour: 4
             line_color: "#4CAF50"
@@ -304,15 +304,15 @@ cards:
                 ha-card { border-radius: 12px; }
 
   # ═══════════════════════════════════════════════════════════════════
-  # 3. MÄHER-STEUERUNG
+  # 3. MOWER CONTROLS
   # ═══════════════════════════════════════════════════════════════════
   - type: horizontal-stack
     cards:
 
-      # ─── Starten ─────────────────────────────────────────────────
+      # ─── Start ─────────────────────────────────────────────────
       - type: custom:button-card
         entity: lawn_mower.navimow_[DEVICE_ID]
-        name: Mähen
+        name: Mow
         icon: mdi:play-circle-outline
         tap_action:
           action: call-service
@@ -320,7 +320,7 @@ cards:
           target:
             entity_id: lawn_mower.navimow_[DEVICE_ID]
         state_display: >-
-          [[[ return entity.state === 'mowing' ? 'Aktiv' : '' ]]]
+          [[[ return entity.state === 'mowing' ? 'Active' : '' ]]]
         styles:
           card:
             - border-radius: "16px"
@@ -380,10 +380,10 @@ cards:
                 [[[ return entity.state === 'paused' ? 'white' : 'var(--primary-text-color)' ]]]
             - margin-top: "4px"
 
-      # ─── Zurück zur Basis ─────────────────────────────────────────
+      # ─── Return to Base ─────────────────────────────────────────
       - type: custom:button-card
         entity: lawn_mower.navimow_[DEVICE_ID]
-        name: Zurück
+        name: Return
         icon: mdi:home-import-outline
         tap_action:
           action: call-service
@@ -414,10 +414,10 @@ cards:
                 [[[ return entity.state === 'docked' ? 'white' : 'var(--primary-text-color)' ]]]
             - margin-top: "4px"
 
-      # ─── Orten ───────────────────────────────────────────────────
+      # ─── Locate ───────────────────────────────────────────────────
       - type: custom:button-card
         entity: button.navimow_[DEVICE_ID]_locate
-        name: Orten
+        name: Locate
         icon: mdi:map-marker-radius
         tap_action:
           action: call-service
@@ -440,56 +440,56 @@ cards:
             - margin-top: "4px"
 
   # ═══════════════════════════════════════════════════════════════════
-  # 4. EINSTELLUNGEN & STATISTIKEN
+  # 4. SETTINGS & STATISTICS
   # ═══════════════════════════════════════════════════════════════════
   - type: horizontal-stack
     cards:
 
       - type: entities
-        title: "⚙️ Einstellungen"
+        title: "⚙️ Settings"
         show_header_toggle: false
         entities:
           - entity: number.navimow_[DEVICE_ID]_cutting_height
-            name: Schnitthöhe
+            name: Cutting Height
             icon: mdi:grass
           - type: divider
           - entity: switch.navimow_[DEVICE_ID]_edge_mowing
-            name: Kantenmähen
+            name: Edge Mowing
             icon: mdi:border-outside
           - entity: switch.navimow_[DEVICE_ID]_rain_mode
-            name: Regenmodus
+            name: Rain Mode
             icon: mdi:weather-rainy
           - entity: switch.navimow_[DEVICE_ID]_anti_theft
-            name: Diebstahlschutz
+            name: Anti-Theft
             icon: mdi:shield-lock
           - type: divider
           - entity: button.navimow_[DEVICE_ID]_restart
-            name: Neustart
+            name: Restart
             icon: mdi:restart
 
       - type: entities
-        title: "📊 Statistiken"
+        title: "📊 Statistics"
         show_header_toggle: false
         entities:
           - entity: sensor.navimow_[DEVICE_ID]_work_time
-            name: Gesamte Mähzeit
+            name: Total Mowing Time
             icon: mdi:timer-outline
           - entity: sensor.navimow_[DEVICE_ID]_work_area
-            name: Gemähte Fläche
+            name: Mowed Area
             icon: mdi:texture-box
           - type: divider
           - entity: sensor.navimow_[DEVICE_ID]_status
             name: Status
             icon: mdi:information-outline
           - entity: sensor.navimow_[DEVICE_ID]_signal_strength
-            name: Signalstärke
+            name: Signal Strength
             icon: mdi:wifi
           - entity: sensor.navimow_[DEVICE_ID]_timestamp
-            name: Letztes Update
+            name: Last Update
             icon: mdi:clock-outline
 
   # ═══════════════════════════════════════════════════════════════════
-  # 5. FEHLERKARTE (nur sichtbar bei aktivem Fehler)
+  # 5. ERROR CARD (only visible when error is active)
   # ═══════════════════════════════════════════════════════════════════
   - type: conditional
     conditions:
@@ -497,7 +497,7 @@ cards:
         state: "on"
     card:
       type: custom:mushroom-template-card
-      primary: "⚠️ Navimow Fehler erkannt"
+      primary: "⚠️ Navimow Error Detected"
       secondary: >-
         Code {{ states('sensor.navimow_[DEVICE_ID]_error_code') }}:
         {{ states('sensor.navimow_[DEVICE_ID]_error_message') }}
