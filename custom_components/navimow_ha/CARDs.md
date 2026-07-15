@@ -1,24 +1,24 @@
 # Navimow Dashboard Cards
 
-Ein komplettes, visuell ansprechendes Lovelace-Dashboard für den Navimow Rasenmäher.
+A complete, visually appealing Lovelace dashboard for the Navimow lawn mower.
 
-## Enthaltene Karten
+## Included Cards
 
-| Karte | Beschreibung |
+| Card | Description |
 |-------|-------------|
-| **Titel + Chips** | Status, Batterie, Signal auf einen Blick |
-| **SVG Live-Karte** | Animierter Mäher auf dunkel-grünem Rasenhintergrund |
-| **Batterie-Gauge** | Nadel-Anzeige + 24h Verlauf (Mini Graph) |
-| **Steuerung** | Mähen / Pause / Zurück / Orten — farblich aktiv |
-| **Einstellungen** | Schnitthöhe, Kantenmähen, Regenmodus, Diebstahlschutz |
-| **Statistiken** | Mähzeit, Fläche, Status, Signal |
-| **Fehlerkarte** | Pulsierend sichtbar, nur wenn Fehler aktiv |
+| **Title + Chips** | Status, Battery, Signal at a glance |
+| **SVG Live Map** | Animated mower on dark green lawn background |
+| **Battery Gauge** | Needle display + 24h history (Mini Graph) |
+| **Controls** | Mowing / Pause / Return / Locate — color active |
+| **Settings** | Cutting height, edge mowing, rain mode, anti-theft |
+| **Statistics** | Mowing time, area, status, signal |
+| **Error Card** | Pulsing visible, only when error active |
 
-## Voraussetzungen (HACS Frontend)
+## Requirements (HACS Frontend)
 
-Folgende Cards über **HACS → Frontend** installieren:
+Install the following cards via **HACS → Frontend**:
 
-| Card | HACS-Name |
+| Card | HACS Name |
 |------|-----------|
 | Mushroom Cards | \lovelace-mushroom\ |
 | Button Card | \lovelace-button-card\ |
@@ -27,28 +27,28 @@ Folgende Cards über **HACS → Frontend** installieren:
 
 ## Installation
 
-1. HACS-Cards installieren und HA neu laden  
-2. Geräte-ID herausfinden:  
-   **Entwicklerwerkzeuge → Zustände → "navimow" suchen**  
-   Beispiel: \sensor.navimow_m550_battery\ → ID = \m550\  
-3. In \dashboard-cards.yaml\ alle **\[DEVICE_ID]\** durch deine ID ersetzen  
-4. Dashboard → ⋮ → Dashboard bearbeiten → ＋ Ansicht → RAW-Editor  
-5. Gesamten Inhalt von \dashboard-cards.yaml\ einfügen → Speichern
+1. Install HACS cards and reload HA  
+2. Find device ID:  
+   **Developer Tools → States → Search for "navimow"**  
+   Example: \sensor.navimow_m550_battery\ → ID = \m550\  
+3. In \dashboard-cards.yaml\ replace all **\[DEVICE_ID]\** with your ID  
+4. Dashboard → ⋮ → Edit Dashboard → ＋ View → RAW Editor  
+5. Paste entire content from \dashboard-cards.yaml\ → Save
 
-## Live-Karte: RANGE anpassen
+## Live Map: Adjust RANGE
 
-Die Live-Karte nutzt **lokale Koordinaten** (Meter ab Ladestation, kein GPS).  
-Passe den \RANGE\-Wert (Zeile ~80 in \dashboard-cards.yaml\) auf den Radius deines Rasens an:
+The live map uses **local coordinates** (meters from charging station, no GPS).  
+Adjust the \RANGE\ value (line ~80 in \dashboard-cards.yaml\) to your lawn radius:
 
 \\\javascript
-const RANGE = 12;  // ← z.B. 8 für kleinen Rasen, 20 für großen Rasen
+const RANGE = 12;  // ← e.g. 8 for small lawn, 20 for large lawn
 \\\
 
-## Darstellung der Live-Karte
+## Live Map Display
 
-- 🟡 **Goldener Punkt** = Ladestation (Koordinaten-Ursprung)
-- 🟢 **Grüner Kreis** = Mäher → pulsiert beim Mähen
-- **Weißes Dreieck** = Fahrtrichtung (basiert auf θ)
-- **Kreuzblatt** = rotiert beim Mähen animiert
-- **Batterie-Balken** oben rechts auf der Karte
-- **Status-Badge** unten auf der Karte
+- 🟡 **Golden dot** = Charging station (coordinate origin)
+- 🟢 **Green circle** = Mower → pulses while mowing
+- **White triangle** = Driving direction (based on θ)
+- **Cross blade** = rotates animated while mowing
+- **Battery bar** top right on the map
+- **Status badge** bottom on the map
