@@ -30,7 +30,7 @@ This is a community fork of the [official integration](https://github.com/segway
 ### Step 1 — Install Integration
 
 1. Open **HACS** → **Integrations** → Top right menu → **Custom repositories**
-2. Enter URL: `https://github.com/daMustermann/NavimowHA` · Category: **Integration** · **Add**
+2. Enter URL: `https://github.com/cap9qd/NavimowHA` · Category: **Integration** · **Add**
 3. Search for **Navimow** in HACS and click **Download**
 4. **Restart Home Assistant**
 
