@@ -23,12 +23,10 @@ BUTTON_DESCRIPTIONS: tuple[ButtonEntityDescription, ...] = (
     ButtonEntityDescription(
         key="locate",
         translation_key="locate",
-        entity_category=EntityCategory.ACTION,
     ),
     ButtonEntityDescription(
         key="restart",
         translation_key="restart",
-        entity_category=EntityCategory.ACTION,
     ),
 )
 
