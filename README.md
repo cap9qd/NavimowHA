@@ -23,44 +23,44 @@ This is a community fork of the [official integration](https://github.com/segway
 
 ---
 
-## 🚀 Schnellstart in 5 Minuten
+## 🚀 Quick Start in 5 Minutes
 
-> Neu hier? Folge dieser Anleitung — von der Installation bis zur ersten Karte.
+> New here? Follow this guide — from installation to your first map.
 
-### Schritt 1 — Integration installieren
+### Step 1 — Install Integration
 
-1. Öffne **HACS** → **Integrationen** → Menü oben rechts → **Benutzerdefinierte Repositories**
-2. URL eingeben: `https://github.com/daMustermann/NavimowHA` · Kategorie: **Integration** · **Hinzufügen**
-3. Suche nach **Navimow** in HACS und klicke **Herunterladen**
-4. **Home Assistant neu starten**
+1. Open **HACS** → **Integrations** → Top right menu → **Custom repositories**
+2. Enter URL: `https://github.com/daMustermann/NavimowHA` · Category: **Integration** · **Add**
+3. Search for **Navimow** in HACS and click **Download**
+4. **Restart Home Assistant**
 
-### Schritt 2 — Integration einrichten
+### Step 2 — Set up Integration
 
-1. **Einstellungen → Geräte & Dienste → Integration hinzufügen**
-2. Nach **Navimow** suchen und auswählen
-3. Auf **Bestätigen** klicken → Navimow-Login-Seite öffnet sich
-4. Mit deinem Navimow- / Segway-Konto anmelden
-5. HA erkennt deinen Mäher automatisch — fertig!
+1. **Settings → Devices & Services → Add Integration**
+2. Search for and select **Navimow**
+3. Click **Confirm** → Navimow login page opens
+4. Log in with your Navimow / Segway account
+5. HA automatically detects your mower — done!
 
-> Kein API-Schlüssel nötig. Die Authentifizierung läuft über OAuth2.
+> No API key needed. Authentication runs via OAuth2.
 
-### Schritt 3 — Dashboard-Karte hinzufügen
+### Step 3 — Add Dashboard Card
 
-Die **Navimow-Karte** wird durch die Integration **automatisch registriert** — du brauchst keine zusätzliche HACS-Frontend-Installation.
+The **Navimow Card** is **automatically registered** by the integration — no additional HACS frontend installation needed.
 
-1. Öffne dein Dashboard → Stift-Symbol (Bearbeiten) → **Karte hinzufügen**
-2. Suche nach **Navimow** → **Navimow Mäher-Karte** auswählen
-3. Im Editor erscheint ein Formular:
+1. Open your dashboard → Pencil icon (Edit) → **Add Card**
+2. Search for **Navimow** → Select **Navimow Mower Card**
+3. A form editor appears:
 
-   **Entitätspräfix** — das ist der mittlere Teil deiner Sensor-IDs:
-   - Gehe zu **Entwicklerwerkzeuge → Zustände**
-   - Suche nach `navimow`
-   - Beispiel: `sensor.navimow_m550_battery` → Präfix ist **`navimow_m550`**
-   - Diesen Wert in das Feld eingeben
+   **Entity prefix** — this is the middle part of your sensor IDs:
+   - Go to **Developer Tools → States**
+   - Search for `navimow`
+   - Example: `sensor.navimow_m550_battery` → prefix is **`navimow_m550`**
+   - Enter this value in the field
 
-4. **Speichern** — die Karte erscheint sofort mit Live-Karte und Steuerung
+4. **Save** — the card appears immediately with live map and controls
 
-Das war's! 🎉
+That's it! 🎉
 
 ---
 
@@ -337,7 +337,7 @@ This integration includes a **custom Lovelace card** (`custom:navimow-card`) tha
 ### Add the card
 
 1. Edit your dashboard → **Add Card** → search **Navimow**
-2. The **Navimow Mäher-Karte** appears in the card picker
+2. The **Navimow Mower Card** appears in the card picker
 3. A GUI editor opens: enter the entity prefix and configure which sections to show
 
 **Minimal YAML** (if added manually):
