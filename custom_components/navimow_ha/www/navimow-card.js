@@ -27,27 +27,27 @@ const NAVIMOW_CARD_VERSION = '1.0.0';
 const DEFAULTS = { range: 12, show_map: true, show_controls: true, show_stats: true, show_settings: false };
 
 const STATUS_COLOR = { mowing: '#4CAF50', charging: '#FFC107', docked: '#2196F3', paused: '#FF9800', error: '#f44336' };
-const STATUS_LABEL = { mowing: 'MÄHT', charging: 'LÄDT', docked: 'GEPARKT', paused: 'PAUSE', error: 'FEHLER' };
+const STATUS_LABEL = { mowing: 'MOWING', charging: 'CHARGING', docked: 'DOCKED', paused: 'PAUSED', error: 'ERROR' };
 
 // ── Editor schema for ha-form ────────────────────────────────────────────────
 const EDITOR_SCHEMA = [
   {
     name: 'entity_prefix',
     required: true,
-    label: 'Entitätspräfix',
-    description: 'z.B. navimow_m550 (aus sensor.navimow_m550_battery)',
+    label: 'Entity prefix',
+    description: 'e.g. navimow_m550 (from sensor.navimow_m550_battery)',
     selector: { text: {} },
   },
   {
     name: 'range',
-    label: 'Kartenradius (Meter)',
-    description: 'Radius des dargestellten Mähbereichs',
+    label: 'Map radius (meters)',
+    description: 'Radius of the mowing area',
     selector: { number: { min: 2, max: 60, step: 1, mode: 'slider' } },
   },
-  { name: 'show_map',      label: 'Live-Karte anzeigen',      selector: { boolean: {} } },
-  { name: 'show_controls', label: 'Steuerung anzeigen',        selector: { boolean: {} } },
-  { name: 'show_stats',    label: 'Statistiken anzeigen',      selector: { boolean: {} } },
-  { name: 'show_settings', label: 'Einstellungen anzeigen',    selector: { boolean: {} } },
+  { name: 'show_map',      label: 'Show live map',      selector: { boolean: {} } },
+  { name: 'show_controls', label: 'Show controls',      selector: { boolean: {} } },
+  { name: 'show_stats',    label: 'Show statistics',    selector: { boolean: {} } },
+  { name: 'show_settings', label: 'Show settings',      selector: { boolean: {} } },
 ];
 
 // ── Styles ───────────────────────────────────────────────────────────────────
@@ -369,7 +369,7 @@ class NavimowCard extends HTMLElement {
         ${errOn ? `
         <div class="error-bar">
           <ha-icon icon="mdi:alert-circle"></ha-icon>
-          <span>Fehler ${errCode ? errCode+': ' : ''}${errMsg || 'Bitte Mäher prüfen'}</span>
+          <span>Error ${errCode ? errCode+': ' : ''}${errMsg || 'Please check mower'}</span>
         </div>` : ''}
 
         <div class="header">
@@ -386,7 +386,7 @@ class NavimowCard extends HTMLElement {
             ? buildMapSVG(mapStates, this._cfg)
             : `<div class="map-offline">
                  <ha-icon icon="mdi:map-marker-off"></ha-icon>
-                 <span>Keine Positionsdaten</span>
+                 <span>No position data</span>
                </div>`
           }
         </div>` : ''}
@@ -394,16 +394,16 @@ class NavimowCard extends HTMLElement {
         ${this._cfg.show_controls ? `
         <div class="controls">
           <button class="btn ${mowerSt==='mowing'?'act-start':''}" data-action="start">
-            <ha-icon icon="mdi:play-circle-outline"></ha-icon>Mähen
+            <ha-icon icon="mdi:play-circle-outline"></ha-icon>Mow
           </button>
           <button class="btn ${mowerSt==='paused'?'act-pause':''}" data-action="pause">
             <ha-icon icon="mdi:pause-circle-outline"></ha-icon>Pause
           </button>
           <button class="btn ${mowerSt==='docked'||mowerSt==='charging'?'act-dock':''}" data-action="dock">
-            <ha-icon icon="mdi:home-import-outline"></ha-icon>Basis
+            <ha-icon icon="mdi:home-import-outline"></ha-icon>Dock
           </button>
           <button class="btn" data-action="locate">
-            <ha-icon icon="mdi:map-marker-radius-outline"></ha-icon>Orten
+            <ha-icon icon="mdi:map-marker-radius-outline"></ha-icon>Locate
           </button>
         </div>` : ''}
 
@@ -413,29 +413,29 @@ class NavimowCard extends HTMLElement {
           <div class="stat">
             <ha-icon class="stat-ico" icon="mdi:battery"></ha-icon>
             <span class="stat-val">${battery !== null ? battery+'%' : '—'}</span>
-            <span class="stat-lbl">Batterie</span>
+            <span class="stat-lbl">Battery</span>
           </div>
           <div class="stat">
             <ha-icon class="stat-ico" icon="mdi:timer-outline"></ha-icon>
             <span class="stat-val">${formatTime(wTime)}</span>
-            <span class="stat-lbl">Mähzeit</span>
+            <span class="stat-lbl">Mowing Time</span>
           </div>
           <div class="stat">
             <ha-icon class="stat-ico" icon="mdi:texture-box"></ha-icon>
             <span class="stat-val">${wArea !== null ? Math.round(wArea)+'m²' : '—'}</span>
-            <span class="stat-lbl">Fläche</span>
+            <span class="stat-lbl">Area</span>
           </div>
         </div>` : ''}
 
         ${this._cfg.show_settings ? `
         <div class="divider"></div>
-        <div class="sect-label">Einstellungen</div>
+        <div class="sect-label">Settings</div>
         <div class="settings">
 
           <div class="setting-row">
             <div class="setting-lbl">
               <ha-icon icon="mdi:ruler"></ha-icon>
-              Schnitthöhe
+              Cutting Height
             </div>
             <div class="height-ctrl">
               <button class="height-btn" data-action="height-down">−</button>
@@ -447,7 +447,7 @@ class NavimowCard extends HTMLElement {
           <div class="setting-row">
             <div class="setting-lbl">
               <ha-icon icon="mdi:border-outside"></ha-icon>
-              Kantenmähen
+              Edge Mowing
             </div>
             <ha-switch
               .checked="${edgeSw === 'on'}"
@@ -458,7 +458,7 @@ class NavimowCard extends HTMLElement {
           <div class="setting-row">
             <div class="setting-lbl">
               <ha-icon icon="mdi:weather-rainy"></ha-icon>
-              Regenmodus
+              Rain Mode
             </div>
             <ha-switch
               .checked="${rainSw === 'on'}"
@@ -469,7 +469,7 @@ class NavimowCard extends HTMLElement {
           <div class="setting-row">
             <div class="setting-lbl">
               <ha-icon icon="mdi:shield-lock-outline"></ha-icon>
-              Diebstahlschutz
+              Anti-Theft
             </div>
             <ha-switch
               .checked="${theftSw === 'on'}"
@@ -491,10 +491,10 @@ class NavimowCard extends HTMLElement {
       <ha-card>
         <div class="unconfigured">
           <ha-icon icon="mdi:robot-mower-outline"></ha-icon>
-          <div class="unc-title">Navimow-Karte nicht konfiguriert</div>
-          <div class="unc-hint">Klicke auf Bearbeiten und gib den Entitätspräfix ein<br>
-            z.B. <strong>navimow_m550</strong><br>
-            (aus sensor.navimow_m550_battery → navimow_m550)</div>
+          <div class="unc-title">Navimow Card Not Configured</div>
+          <div class="unc-hint">Click Edit and enter the entity prefix<br>
+            e.g. <strong>navimow_m550</strong><br>
+            (from sensor.navimow_m550_battery → navimow_m550)</div>
         </div>
       </ha-card>`;
   }
@@ -601,9 +601,9 @@ class NavimowCardEditor extends HTMLElement {
     const hint = document.createElement('div');
     hint.className = 'hint';
     hint.innerHTML = `
-      Gib den <b>Entitätspräfix</b> ein: der Teil vor dem ersten Suffix in der Mäher-Entity-ID.<br>
-      Beispiel: <code>lawn_mower.navimow_m550</code> → Präfix: <code>navimow_m550</code><br>
-      <b>Tipp:</b> Entwicklerwerkzeuge → Zustände → nach <code>lawn_mower</code> suchen.
+      Enter the <b>entity prefix</b>: the part before the first suffix in the mower entity ID.<br>
+      Example: <code>lawn_mower.navimow_m550</code> → Prefix: <code>navimow_m550</code><br>
+      <b>Tip:</b> Developer Tools → States → search for <code>lawn_mower</code>.
     `;
     this.shadowRoot.appendChild(hint);
 
