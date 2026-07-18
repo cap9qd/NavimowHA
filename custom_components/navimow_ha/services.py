@@ -6,10 +6,10 @@ from typing import Any
 
 import voluptuous as vol
 
+from homeassistant.components import persistent_notification
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers import notification
 
 from .const import DOMAIN
 
@@ -236,24 +236,12 @@ def async_setup_services(hass: HomeAssistant, _api: Any) -> None:
         """Send MQTT test results as a notification."""
         title = "Navimow MQTT Test Results"
 
-        if persistent:
-            notification.async_create(
+        if persistent or send:
+            persistent_notification.async_create(
                 hass,
                 title=title,
                 message=summary,
                 notification_id="navimow_mqtt_test_results",
-            )
-
-        if send:
-            # Try to send via mobile app notification
-            await hass.services.async_call(
-                "persistent_notification",
-                "create",
-                {
-                    "title": title,
-                    "message": summary,
-                    "notification_id": "navimow_mqtt_test_results",
-                },
             )
 
     hass.services.async_register(
