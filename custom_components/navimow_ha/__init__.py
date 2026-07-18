@@ -22,6 +22,7 @@ from .const import (
     MQTT_PORT,
     MQTT_USERNAME,
     MQTT_PASSWORD,
+    HTTP_ONLY_MODE,
 )
 from .services import async_setup_services
 
@@ -431,19 +432,27 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 reconnect_min_delay=1,
                 reconnect_max_delay=60,
             )
-            _LOGGER.info(
-                "Connecting to MQTT: broker=%s port=%s ws_path=%s",
-                mqtt_host,
-                mqtt_port,
-                ws_path,
-            )
-            sdk.connect()
+            if not HTTP_ONLY_MODE:
+                _LOGGER.info(
+                    "Connecting to MQTT: broker=%s port=%s ws_path=%s",
+                    mqtt_host,
+                    mqtt_port,
+                    ws_path,
+                )
+                sdk.connect()
+            else:
+                _LOGGER.info(
+                    "HTTP-only mode: MQTT connection skipped (broker=%s port=%s)",
+                    mqtt_host,
+                    mqtt_port,
+                )
             return sdk
 
         sdk = await hass.async_add_executor_job(_create_sdk, api)
-        _attach_mqtt_debug_hooks(sdk, api)
+        if not HTTP_ONLY_MODE:
+            _attach_mqtt_debug_hooks(sdk, api)
+            hass.async_create_task(_probe_mqtt_status(sdk))
         async_setup_services(hass, api)
-        hass.async_create_task(_probe_mqtt_status(sdk))
 
         coordinators: dict[str, NavimowCoordinator] = {}
         for device in devices:

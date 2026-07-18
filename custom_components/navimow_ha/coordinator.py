@@ -21,6 +21,7 @@ from mower_sdk.sdk import NavimowSDK
 from .const import (
     DOMAIN,
     HTTP_FALLBACK_MIN_INTERVAL,
+    HTTP_ONLY_MODE,
     MQTT_STALE_SECONDS,
     UPDATE_INTERVAL,
 )
@@ -58,8 +59,12 @@ class NavimowCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def async_setup(self) -> None:
         """Register callbacks from SDK."""
-        self.sdk.on_state(self._handle_state)
-        self.sdk.on_attributes(self._handle_attributes)
+        if not HTTP_ONLY_MODE:
+            self.sdk.on_state(self._handle_state)
+            self.sdk.on_attributes(self._handle_attributes)
+            _LOGGER.debug("MQTT callbacks registered for device %s", self.device.id)
+        else:
+            _LOGGER.debug("HTTP-only mode: MQTT callbacks not registered for device %s", self.device.id)
 
     def _build_data(self) -> dict[str, Any]:
         return {
@@ -128,77 +133,49 @@ class NavimowCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         return access_token
 
     async def _async_update_data(self) -> dict[str, Any]:
+        # HTTP-ONLY MODE: Always poll the HTTP API for fresh data.
+        # MQTT is unreliable for this device (X450) - messages are delayed or stale.
         # Proactively refresh the token on every coordinator update cycle.
-        # Refreshing only during HTTP fallback would leave the token stale while
-        # MQTT is healthy, causing CODE_OAUTH_INFO_ILLEGAL when the user sends
-        # a command after the token has silently expired.
         try:
             await self._async_ensure_valid_token()
         except ConfigEntryAuthFailed:
             raise
 
-        cached_state = self.sdk.get_cached_state(self.device.id)
-        if cached_state is not None:
-            self._last_state = cached_state
-            self._last_data_source = "mqtt_cache"
-            _LOGGER.debug(
-                "SDK cached state retrieved: device=%s state=%s battery=%s",
-                self.device.id,
-                cached_state.state if cached_state else None,
-                cached_state.battery if cached_state else None,
-            )
-        else:
-            _LOGGER.warning(
-                "SDK returned None for cached_state: device=%s (MQTT may not be delivering data)",
-                self.device.id,
-            )
-
-        cached_attrs = self.sdk.get_cached_attributes(self.device.id)
-        if cached_attrs is not None:
-            self._last_attributes = cached_attrs
-            _LOGGER.debug("SDK cached attributes retrieved: device=%s", self.device.id)
-        else:
-            _LOGGER.debug("SDK returned None for cached_attributes: device=%s", self.device.id)
-
         now = time.monotonic()
-        is_mqtt_stale = (
-            self._last_mqtt_update is None
-            or now - self._last_mqtt_update > MQTT_STALE_SECONDS
-        )
-        can_http_fetch = (
-            self._last_http_fetch is None
-            or now - self._last_http_fetch > HTTP_FALLBACK_MIN_INTERVAL
-        )
-        if is_mqtt_stale and can_http_fetch:
-            _LOGGER.info(
-                "MQTT stale (last_update=%s, stale_threshold=%ss), triggering HTTP fallback for device=%s",
-                self._last_mqtt_update,
-                MQTT_STALE_SECONDS,
+
+        # Always use HTTP polling for reliable data
+        try:
+            status = await self.api.async_get_device_status(self.device.id)
+            self._last_state = self._device_status_to_state(status)
+            self._last_http_fetch = now
+            self._last_data_source = "http_polling"
+            _LOGGER.debug(
+                "HTTP poll successful: device=%s state=%s battery=%s",
                 self.device.id,
+                status.status.value if status and status.status else None,
+                status.battery if status else None,
             )
-            try:
-                status = await self.api.async_get_device_status(self.device.id)
-                self._last_state = self._device_status_to_state(status)
-                self._last_http_fetch = now
-                self._last_data_source = "http_fallback"
-                _LOGGER.info(
-                    "HTTP fallback successful: device=%s state=%s battery=%s",
+        except ConfigEntryAuthFailed:
+            raise
+        except Exception as err:
+            _LOGGER.warning(
+                "HTTP poll failed for device %s: %s", self.device.id, err
+            )
+            # On HTTP failure, fall back to MQTT cache if available
+            cached_state = self.sdk.get_cached_state(self.device.id)
+            if cached_state is not None:
+                self._last_state = cached_state
+                self._last_data_source = "mqtt_cache_fallback"
+                _LOGGER.debug(
+                    "Using MQTT cache as fallback: device=%s state=%s",
                     self.device.id,
-                    status.status.value if status and status.status else None,
-                    status.battery if status else None,
-                )
-            except ConfigEntryAuthFailed:
-                raise
-            except Exception as err:
-                _LOGGER.warning(
-                    "HTTP fallback failed for device %s: %s", self.device.id, err
+                    cached_state.state if cached_state else None,
                 )
 
         _LOGGER.info(
-            "Coordinator update: device=%s source=%s mqtt_ts=%s http_ts=%s state=%s battery=%s",
+            "Coordinator update: device=%s source=%s http_ts=%s state=%s battery=%s",
             self.device.id,
             self._last_data_source,
-            self._last_mqtt_update,
             self._last_http_fetch,
             self._last_state.state if self._last_state else "None",
             self._last_state.battery if self._last_state else "None",

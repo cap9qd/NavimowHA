@@ -37,7 +37,12 @@ UPDATE_INTERVAL: Final = 30
 MQTT_STALE_SECONDS: Final = 300
 
 # Minimum interval between HTTP fallback requests to avoid hammering the API
+# Note: In HTTP-only mode, this is the primary polling interval (30s)
 HTTP_FALLBACK_MIN_INTERVAL: Final = 60
+
+# HTTP-only mode: Set to True to disable MQTT and use only HTTP polling
+# This is useful for devices (like X450) where MQTT data is unreliable or stale
+HTTP_ONLY_MODE: Final = True
 
 # Mapping from mower status strings to HA LawnMowerActivity values
 MOWER_STATUS_TO_ACTIVITY = {
