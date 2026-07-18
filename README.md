@@ -327,6 +327,43 @@ automation:
           message: "Error: {{ states('sensor.navimow_error_message') }}"
 ```
 
+### Test MQTT data quality (diagnostic)
+
+Run this service to test if your mower model sends data via MQTT (position, metrics, etc.):
+
+```yaml
+service: navimow_ha.test_mqtt_data
+data:
+  duration: 60                    # Test duration in seconds (10-300)
+  persistent_notification: true   # Show results in HA notifications
+  send_notification: false        # Send to mobile app (optional)
+```
+
+Results appear in **Notifications** and are stored in `hass.data['navimow_ha']['mqtt_test_results']`.
+
+**Note:** Some mower models (including X450) don't send position/metrics data via MQTT. These models rely on HTTP polling for state and battery data.
+
+### Automatically test MQTT when mowing starts
+
+This automation tests MQTT data quality after the mower has been running for 5 minutes:
+
+```yaml
+automation:
+  - alias: "Navimow – Test MQTT when mowing starts"
+    trigger:
+      - platform: state
+        entity_id: lawn_mower.navimow_YOUR_DEVICE_ID
+        to: "mowing"
+        for: "00:05:00"  # Wait 5 minutes after mowing starts
+    action:
+      - service: navimow_ha.test_mqtt_data
+        data:
+          duration: 60
+          persistent_notification: true
+```
+
+Replace `YOUR_DEVICE_ID` with your actual device ID (e.g., `navimow_m550`).
+
 ---
 
 ## Dashboard Card
