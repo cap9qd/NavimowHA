@@ -8,7 +8,7 @@ A feature-rich Home Assistant custom integration for **Segway Navimow** robotic 
 This is a community fork of the [official integration](https://github.com/segwaynavimow/NavimowHA) with significantly extended functionality.
 
 [![HACS Badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz)
-[![GitHub Release](https://img.shields.io/github/v/release/daMustermann/NavimowHA)](https://github.com/daMustermann/NavimowHA/releases)
+[![GitHub Release](https://img.shields.io/github/v/release/cap9qd/NavimowHA)](https://github.com/cap9qd/NavimowHA/releases)
 [![License](https://img.shields.io/github/license/cap9qd/NavimowHA)](LICENSE)
 
 [![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=cap9qd&repository=NavimowHA&category=Integration)
@@ -105,14 +105,14 @@ That's it! 🎉
 ### HACS (recommended)
 
 1. Open **HACS** → **Integrations** → top-right menu → **Custom repositories**
-2. Add: `https://github.com/daMustermann/NavimowHA` — Category: **Integration**
+2. Add: `https://github.com/cap9qd/NavimowHA` — Category: **Integration**
 3. Search for **Navimow** in HACS and install it
 4. **Restart Home Assistant**
 5. Go to **Settings** → **Devices & Services** → **Add Integration** → search for **Navimow**
 
 ### Manual
 
-1. Download the latest release from the [Releases page](https://github.com/daMustermann/NavimowHA/releases)
+1. Download the latest release from the [Releases page](https://github.com/cap9qd/NavimowHA/releases)
 2. Copy the `custom_components/navimow_ha/` directory into your HA `custom_components/` folder
 3. Restart Home Assistant
 4. Add the integration via **Settings** → **Devices & Services**

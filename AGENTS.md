@@ -2,7 +2,7 @@
 
 ## Repo Location
 
-**Fork**: https://github.com/daMustermann/NavimowHA (original: segwaynavimow/NavimowHA)
+**Fork**: https://github.com/cap9qd/NavimowHA (original: segwaynavimow/NavimowHA)
 
 ## Repo Structure
 

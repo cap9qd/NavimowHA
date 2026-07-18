@@ -43,7 +43,7 @@ HA → Navimow Integration → NavimowSDK → MQTT ←→ REST API ←→ Navimo
 ## Installation
 
 1. HACS → Integrations → Custom repositories
-2. Add: `https://github.com/daMustermann/NavimowHA`, Category: **Integration**
+2. Add: `https://github.com/cap9qd/NavimowHA`, Category: **Integration**
 3. Search **Navimow** in HACS and install
 4. Restart Home Assistant
 5. Settings → Devices & Services → Add Integration → search **Navimow**
@@ -59,7 +59,7 @@ HA → Navimow Integration → NavimowSDK → MQTT ←→ REST API ←→ Navimo
 
 - Check HA logs
 - Restart HA after updates
-- Issues: https://github.com/daMustermann/NavimowHA/issues
+- Issues: https://github.com/cap9qd/NavimowHA/issues
 
 ---
 

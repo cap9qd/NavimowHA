@@ -643,7 +643,7 @@ if (!window.customCards.find(c => c.type === 'navimow-card')) {
     name:             'Navimow Mäher-Karte',
     description:      'Live-Karte und Steuerung für Navimow Rasenmäher. Automatisch durch die Integration eingebunden.',
     preview:          true,
-    documentationURL: 'https://github.com/daMustermann/NavimowHA',
+    documentationURL: 'https://github.com/cap9qd/NavimowHA',
   });
 }
 
