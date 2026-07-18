@@ -141,10 +141,24 @@ class NavimowCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if cached_state is not None:
             self._last_state = cached_state
             self._last_data_source = "mqtt_cache"
+            _LOGGER.debug(
+                "SDK cached state retrieved: device=%s state=%s battery=%s",
+                self.device.id,
+                cached_state.state if cached_state else None,
+                cached_state.battery if cached_state else None,
+            )
+        else:
+            _LOGGER.warning(
+                "SDK returned None for cached_state: device=%s (MQTT may not be delivering data)",
+                self.device.id,
+            )
 
         cached_attrs = self.sdk.get_cached_attributes(self.device.id)
         if cached_attrs is not None:
             self._last_attributes = cached_attrs
+            _LOGGER.debug("SDK cached attributes retrieved: device=%s", self.device.id)
+        else:
+            _LOGGER.debug("SDK returned None for cached_attributes: device=%s", self.device.id)
 
         now = time.monotonic()
         is_mqtt_stale = (
@@ -156,11 +170,23 @@ class NavimowCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             or now - self._last_http_fetch > HTTP_FALLBACK_MIN_INTERVAL
         )
         if is_mqtt_stale and can_http_fetch:
+            _LOGGER.info(
+                "MQTT stale (last_update=%s, stale_threshold=%ss), triggering HTTP fallback for device=%s",
+                self._last_mqtt_update,
+                MQTT_STALE_SECONDS,
+                self.device.id,
+            )
             try:
                 status = await self.api.async_get_device_status(self.device.id)
                 self._last_state = self._device_status_to_state(status)
                 self._last_http_fetch = now
                 self._last_data_source = "http_fallback"
+                _LOGGER.info(
+                    "HTTP fallback successful: device=%s state=%s battery=%s",
+                    self.device.id,
+                    status.status.value if status and status.status else None,
+                    status.battery if status else None,
+                )
             except ConfigEntryAuthFailed:
                 raise
             except Exception as err:
@@ -168,24 +194,32 @@ class NavimowCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     "HTTP fallback failed for device %s: %s", self.device.id, err
                 )
 
-        _LOGGER.debug(
-            "Coordinator update: device=%s source=%s mqtt_ts=%s http_ts=%s",
+        _LOGGER.info(
+            "Coordinator update: device=%s source=%s mqtt_ts=%s http_ts=%s state=%s battery=%s",
             self.device.id,
             self._last_data_source,
             self._last_mqtt_update,
             self._last_http_fetch,
+            self._last_state.state if self._last_state else "None",
+            self._last_state.battery if self._last_state else "None",
         )
         self.data = self._build_data()
         return self.data
 
     def _handle_state(self, state: DeviceStateMessage) -> None:
         if state.device_id != self.device.id:
+            _LOGGER.debug(
+                "MQTT state skipped: device mismatch (expected=%s, got=%s)",
+                self.device.id,
+                state.device_id,
+            )
             return
-        _LOGGER.debug(
-            "MQTT state received: device=%s state=%s battery=%s",
+        _LOGGER.info(
+            "MQTT state received: device=%s state=%s battery=%s signal=%s",
             state.device_id,
             state.state,
             state.battery,
+            state.signal_strength,
         )
         self._last_mqtt_update = time.monotonic()
         self._last_data_source = "mqtt_push"
@@ -193,11 +227,16 @@ class NavimowCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     def _handle_attributes(self, attrs: DeviceAttributesMessage) -> None:
         if attrs.device_id != self.device.id:
+            _LOGGER.debug(
+                "MQTT attributes skipped: device mismatch (expected=%s, got=%s)",
+                self.device.id,
+                attrs.device_id,
+            )
             return
-        _LOGGER.debug(
-            "MQTT attributes received: device=%s keys=%d",
+        _LOGGER.info(
+            "MQTT attributes received: device=%s attribute_count=%d",
             attrs.device_id,
-            len(getattr(attrs, "__dict__", {}) or {}),
+            len(getattr(attrs, "attributes", {}) or {}),
         )
         self._last_mqtt_update = time.monotonic()
         self.hass.loop.call_soon_threadsafe(self._update_from_attributes, attrs)

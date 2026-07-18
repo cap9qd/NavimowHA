@@ -37,7 +37,7 @@ UPDATE_INTERVAL: Final = 30
 MQTT_STALE_SECONDS: Final = 300
 
 # Minimum interval between HTTP fallback requests to avoid hammering the API
-HTTP_FALLBACK_MIN_INTERVAL: Final = 3600
+HTTP_FALLBACK_MIN_INTERVAL: Final = 60
 
 # Mapping from mower status strings to HA LawnMowerActivity values
 MOWER_STATUS_TO_ACTIVITY = {
