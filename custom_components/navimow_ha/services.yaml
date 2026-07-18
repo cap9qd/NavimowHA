@@ -20,3 +20,35 @@ set_blade_height:
           max: 60
           step: 1
           mode: slider
+
+test_mqtt_data:
+  name: Test MQTT data quality
+  description: Test Navimow MQTT data quality and generate a diagnostic summary. This test monitors MQTT messages for the specified duration and reports which data fields are being received (position, metrics, etc.). Results are stored in hass.data and can be sent as a notification.
+  fields:
+    duration:
+      name: Test duration
+      description: Duration in seconds to monitor MQTT messages (10-300 seconds).
+      required: false
+      default: 60
+      example: 60
+      selector:
+        number:
+          min: 10
+          max: 300
+          step: 10
+          unit: seconds
+          mode: slider
+    send_notification:
+      name: Send notification
+      description: Send the test results as a mobile app notification.
+      required: false
+      default: false
+      selector:
+        boolean:
+    persistent_notification:
+      name: Persistent notification
+      description: Create a persistent notification in Home Assistant with the test results.
+      required: false
+      default: true
+      selector:
+        boolean:
