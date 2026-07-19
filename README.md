@@ -66,29 +66,31 @@ That's it! 🎉
 
 ## Features
 
-| Feature | Official | This Fork |
-|---------|----------|-----------|
-| `lawn_mower` entity (start/pause/dock/resume) | ✅ | ✅ |
-| Battery sensor | ✅ | ✅ |
-| Status sensor | – | ✅ |
-| Signal strength sensor | – | ✅ |
-| Position tracking (X/Y/heading) | – | ✅ |
-| Device tracker on HA map | – | ✅ |
-| Error sensors (code + message) | – | ✅ |
-| Work statistics (time + area) | – | ✅ |
-| Binary sensors (error/charging/mowing/docked/returning) | – | ✅ |
-| Cutting height — number slider | – | ✅ |
-| Cutting height — select dropdown | – | ✅ |
-| Edge mowing switch | – | ✅ |
-| Rain mode switch | – | ✅ |
-| Anti-theft switch | – | ✅ |
-| Locate button (make mower beep) | – | ✅ |
-| Restart button | – | ✅ |
-| Real-time MQTT updates | – | ✅ |
-| Automatic token + MQTT credential refresh | – | ✅ |
-| HTTP fallback when MQTT is stale | – | ✅ |
-| **Custom Lovelace card** (auto-registered, GUI config) | – | ✅ |
-| **Live SVG map** with animated mower icon | – | ✅ |
+| Feature | Official | This Fork (HTTP) | This Fork (MQTT) |
+|---------|----------|------------------|------------------|
+| `lawn_mower` entity (start/pause/dock/resume) | ✅ | ✅ | ✅ |
+| Battery sensor | ✅ | ✅ | ✅ |
+| Status sensor | – | ✅ | ✅ |
+| Signal strength sensor | – | ❌ | ✅ |
+| Position tracking (X/Y/heading) | – | ❌ | ✅ |
+| Device tracker on HA map | – | ❌ | ✅ |
+| Error sensors (code + message) | – | ❌ | ✅ |
+| Work statistics (time + area) | – | ❌ | ✅ |
+| Binary sensors (error/charging/mowing/docked/returning) | – | ✅ | ✅ |
+| Cutting height — number slider | – | ❌ | ✅ |
+| Cutting height — select dropdown | – | ❌ | ✅ |
+| Edge mowing switch | – | ❌ | ✅ |
+| Rain mode switch | – | ❌ | ✅ |
+| Anti-theft switch | – | ❌ | ✅ |
+| Locate button (make mower beep) | – | ✅ | ✅ |
+| Restart button | – | ✅ | ✅ |
+| Real-time MQTT updates | – | ❌ | ✅ |
+| Automatic token + MQTT credential refresh | – | ✅ | ✅ |
+| HTTP fallback when MQTT is stale | – | ✅ | ✅ |
+| **Custom Lovelace card** (auto-registered, GUI config) | – | ✅ | ✅ |
+| **Live SVG map** with animated mower icon | – | ❌ | ✅ |
+
+> **Note:** Some mower models (including X450) don't send position, metrics, or attribute data via MQTT. These models use HTTP polling mode and have limited features (marked ❌). Models that support full MQTT data have access to all features (marked ✅).
 
 ---
 
