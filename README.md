@@ -153,87 +153,114 @@ The primary control entity. Supports:
 
 ### Sensors
 
-| Sensor | Unit | Description |
-|--------|------|-------------|
-| Battery | % | Current battery charge level |
-| Signal Strength | % | GNSS satellite signal quality |
-| Status | – | Raw mower status string |
-| Position X | m | Local map X coordinate (from charging station) |
-| Position Y | m | Local map Y coordinate (from charging station) |
-| Heading | rad | Mower orientation in radians |
-| Error Code | – | Active error code, if any |
-| Error Message | – | Human-readable error description |
-| Work Time | s | Total cumulative mowing time |
-| Work Area | m² | Total cumulative mowed area |
-| Last Update | – | Timestamp of the last state message |
+| Sensor | Unit | Description | HTTP Mode | MQTT Mode |
+|--------|------|-------------|-----------|-----------|
+| Battery | % | Current battery charge level | ✅ | ✅ |
+| Signal Strength | % | GNSS satellite signal quality | ❌ | ✅ |
+| Status | – | Raw mower status string | ✅ | ✅ |
+| Position X | m | Local map X coordinate (from charging station) | ❌ | ✅ |
+| Position Y | m | Local map Y coordinate (from charging station) | ❌ | ✅ |
+| Heading | rad | Mower orientation in radians | ❌ | ✅ |
+| Error Code | – | Active error code, if any | ❌ | ✅ |
+| Error Message | – | Human-readable error description | ❌ | ✅ |
+| Work Time | s | Total cumulative mowing time | ❌ | ✅ |
+| Work Area | m² | Total cumulative mowed area | ❌ | ✅ |
+| Last Update | – | Timestamp of the last state message | ✅ | ✅ |
 
 > **Note**: Position X/Y are **local coordinates** (metres from the charging station), not GPS coordinates.
 > They can still be used with the HA map card for relative positioning.
+>
+> **HTTP Mode** (default for X450): Only battery, status, and last update are available.
+> **MQTT Mode**: All sensors available if mower model supports it.
 
 ---
 
 ### Binary Sensors
 
-| Sensor | Device Class | Description |
-|--------|-------------|-------------|
-| Error | Problem | `on` when an error is active |
-| Charging | Battery Charging | `on` when at the station and charging |
-| Mowing | – | `on` when actively mowing |
-| Docked | – | `on` when docked at the station |
-| Returning | – | `on` when driving back to the station |
+| Sensor | Device Class | Description | HTTP Mode | MQTT Mode |
+|--------|-------------|-------------|-----------|-----------|
+| Error | Problem | `on` when an error is active | ❌ | ✅ |
+| Charging | Battery Charging | `on` when at the station and charging | ✅ | ✅ |
+| Mowing | – | `on` when actively mowing | ✅ | ✅ |
+| Docked | – | `on` when docked at the station | ✅ | ✅ |
+| Returning | – | `on` when driving back to the station | ❌ | ✅ |
+
+> **HTTP Mode**: Basic state sensors (charging, mowing, docked) work via state derivation.
+> **MQTT Mode**: All binary sensors available including error and returning.
 
 ---
 
 ### Number Entity
 
-| Entity | Range | Step | Description |
-|--------|-------|------|-------------|
-| Cutting Height | 25–80 mm | 5 mm | Set the blade height via a slider |
+| Entity | Range | Step | Description | HTTP Mode | MQTT Mode |
+|--------|-------|------|-------------|-----------|-----------|
+| Cutting Height | 25–80 mm | 5 mm | Set the blade height via a slider | ❌ | ✅ |
+
+> **HTTP Mode**: Not available - mower model doesn't report blade height via HTTP API.
+> **MQTT Mode**: Available if mower model reports bladeHeight attribute.
 
 ---
 
 ### Select Entity
 
-| Entity | Options | Description |
-|--------|---------|-------------|
-| Cutting Height (Select) | 25–80 mm | Set the blade height via a dropdown |
+| Entity | Options | Description | HTTP Mode | MQTT Mode |
+|--------|---------|-------------|-----------|-----------|
+| Cutting Height (Select) | 25–80 mm | Set the blade height via a dropdown | ❌ | ✅ |
 
 > The **number entity** (slider) is the recommended way to adjust the cutting height.
 > The select entity is kept for dashboard card compatibility.
+>
+> **HTTP Mode**: Not available.
+> **MQTT Mode**: Available if mower model reports bladeHeight attribute.
 
 ---
 
 ### Switches
 
-| Switch | Description |
-|--------|-------------|
-| Edge Mowing | Toggle perimeter / edge mowing pass |
-| Rain Mode | Allow or block mowing in rain |
-| Anti-Theft | Enable or disable the theft alarm |
+| Switch | Description | HTTP Mode | MQTT Mode |
+|--------|-------------|-----------|-----------|
+| Edge Mowing | Toggle perimeter / edge mowing pass | ❌ | ✅ |
+| Rain Mode | Allow or block mowing in rain | ❌ | ✅ |
+| Anti-Theft | Enable or disable the theft alarm | ❌ | ✅ |
+
+> **HTTP Mode**: Not available - mower model doesn't report these attributes via HTTP API.
+> **MQTT Mode**: Available if mower model reports these attributes via MQTT.
 
 ---
 
 ### Buttons
 
-| Button | Description |
-|--------|-------------|
-| Locate | Make the mower beep/buzz so you can find it |
-| Restart | Restart the mower firmware |
+| Button | Description | HTTP Mode | MQTT Mode |
+|--------|-------------|-----------|-----------|
+| Locate | Make the mower beep/buzz so you can find it | ✅ | ✅ |
+| Restart | Restart the mower firmware | ✅ | ✅ |
+
+> **HTTP Mode**: Both buttons work via REST API commands.
+> **MQTT Mode**: Both buttons work via MQTT commands.
 
 ---
 
 ### Device Tracker
 
-The mower appears as a GPS tracker entity on the **HA Map** card.  
+| Feature | HTTP Mode | MQTT Mode |
+|---------|-----------|-----------|
+| Device Tracker on HA Map | ❌ | ✅ |
+| Position X/Y | ❌ | ✅ |
+| Heading (theta) | ❌ | ✅ |
+
+The mower appears as a GPS tracker entity on the **HA Map** card when MQTT data is available.  
 Because the coordinates are local (metres relative to the charging station), the absolute
 position on a world map will not be geographically accurate — but the relative movement
 and mowing path are fully visible.
 
-Extra attributes exposed:
+Extra attributes exposed (MQTT mode only):
 
 - `posture_x` / `posture_y` — raw coordinates in metres
 - `posture_theta` — heading in radians
 - `map_id` — internal map identifier, if available
+
+> **HTTP Mode**: Device tracker not available - position data not sent by mower model.
+> **MQTT Mode**: Full device tracker available if mower model sends position data.
 
 ---
 
